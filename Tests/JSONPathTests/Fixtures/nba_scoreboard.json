@@ -1,0 +1,69 @@
+{
+ "_note": "Hand-written from the documented todaysScoreboard_00.json shape, not a live recording \u2014 cdn.nba.com returned 403 from the build location.",
+ "meta": {
+  "version": 1,
+  "request": "http://nba.cloud/games/20260909/scoreboard",
+  "time": "2026-09-09 12:00:00.0"
+ },
+ "scoreboard": {
+  "gameDate": "2026-09-09",
+  "leagueId": "00",
+  "leagueName": "National Basketball Association",
+  "games": [
+   {
+    "gameId": "0022600001",
+    "gameCode": "20260909/BOSLAL",
+    "gameStatus": 1,
+    "gameStatusText": "7:30 pm ET",
+    "period": 0,
+    "gameClock": "",
+    "gameTimeUTC": "2026-09-09T23:30:00Z",
+    "homeTeam": {
+     "teamId": 1610612747,
+     "teamName": "Lakers",
+     "teamCity": "Los Angeles",
+     "teamTricode": "LAL",
+     "wins": 0,
+     "losses": 0,
+     "score": 0
+    },
+    "awayTeam": {
+     "teamId": 1610612738,
+     "teamName": "Celtics",
+     "teamCity": "Boston",
+     "teamTricode": "BOS",
+     "wins": 0,
+     "losses": 0,
+     "score": 0
+    }
+   },
+   {
+    "gameId": "0022600002",
+    "gameCode": "20260909/GSWDEN",
+    "gameStatus": 1,
+    "gameStatusText": "10:00 pm ET",
+    "period": 0,
+    "gameClock": "",
+    "gameTimeUTC": "2026-09-10T02:00:00Z",
+    "homeTeam": {
+     "teamId": 1610612743,
+     "teamName": "Nuggets",
+     "teamCity": "Denver",
+     "teamTricode": "DEN",
+     "wins": 0,
+     "losses": 0,
+     "score": 0
+    },
+    "awayTeam": {
+     "teamId": 1610612744,
+     "teamName": "Warriors",
+     "teamCity": "Golden State",
+     "teamTricode": "GSW",
+     "wins": 0,
+     "losses": 0,
+     "score": 0
+    }
+   }
+  ]
+ }
+}
