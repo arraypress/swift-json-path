@@ -22,6 +22,7 @@ public struct StatusRule: Sendable, Hashable, Codable {
     /// What to show when the rule matches.
     public var label: String
 
+    /// A rule; the defaults make an empty equals rule, which matches nothing.
     public init(mode: Mode = .equals, match: String = "", label: String = "") {
         self.mode = mode
         self.match = match

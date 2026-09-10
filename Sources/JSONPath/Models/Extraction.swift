@@ -43,6 +43,7 @@ public struct Extraction: Sendable, Hashable, Codable {
     /// Placed between the two values.
     public var separator: String
 
+    /// A query with every field defaulted to doing nothing but the path.
     public init(
         path: String,
         arrayOperation: ArrayOperation = .none,

@@ -25,6 +25,7 @@ extension Extraction {
         /// caller can keep its previous reading.
         public let rawValue: String?
 
+        /// A result, as the engine produces it.
         public init(display: String, rawValue: String?) {
             self.display = display
             self.rawValue = rawValue
