@@ -10,13 +10,13 @@ import Foundation
 /// Written as text, comma-separated, `match:Label`. A prefix on the match
 /// picks the mode: none is a case-insensitive equal, `=` exact and
 /// case-sensitive, `~` contains, `>` `>=` `<` `<=` compare as numbers,
-/// `low..high` bands between two, and `*` alone matches whatever is left.
+/// `low..high` ranges between two, and `*` alone matches whatever is left.
 ///
 /// `none:Operational, minor:Minor Outage, *:Issues` is a status page.
 /// `<=50:Good, <=100:Moderate, <=150:Unhealthy for Sensitive Groups,
 /// <=200:Unhealthy, <=300:Very Unhealthy, *:Hazardous` is the US air
 /// quality scale — the rules are tried in order, so ascending thresholds
-/// read as the bands between them.
+/// read as the ranges between them.
 public struct StatusRule: Sendable, Hashable, Codable {
 
     /// How ``match`` is compared.

@@ -38,7 +38,7 @@ extension StatusRule {
 
         /// Inside `low..high`, both ends included. Written `51..100:Moderate`.
         ///
-        /// The separator is `..` rather than `-` so a band over negative
+        /// The separator is `..` rather than `-` so a range over negative
         /// numbers — `-10..-5` — still reads.
         case range
 

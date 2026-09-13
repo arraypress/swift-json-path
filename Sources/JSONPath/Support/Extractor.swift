@@ -78,23 +78,23 @@ struct Extractor {
         }
 
         result.append(query.suffix)
-        return banded(result)
+        return labelled(result)
     }
 
-    /// The band's label placed around the finished string.
+    /// The label placed around the finished string.
     ///
-    /// It reads the raw value, not the formatted one, so a band is a
+    /// It reads the raw value, not the formatted one, so a label is a
     /// threshold on the number itself and survives any display format. No
     /// value found means no label — there is nothing to describe.
-    private func banded(_ text: String) -> String {
-        guard query.bandPosition != .none, !query.bandRules.isEmpty,
+    private func labelled(_ text: String) -> String {
+        guard query.labelPosition != .none, !query.labelRules.isEmpty,
               let raw = rawValue,
-              let label = StatusMapping.label(for: raw, rules: query.bandRules),
+              let label = StatusMapping.label(for: raw, rules: query.labelRules),
               !label.isEmpty
         else { return text }
-        return switch query.bandPosition {
-        case .prefix: label + query.bandSeparator + text
-        case .suffix: text + query.bandSeparator + label
+        return switch query.labelPosition {
+        case .prefix: label + query.labelSeparator + text
+        case .suffix: text + query.labelSeparator + label
         case .none: text
         }
     }

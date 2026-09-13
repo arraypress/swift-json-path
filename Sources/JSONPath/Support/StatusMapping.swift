@@ -46,7 +46,7 @@ enum StatusMapping {
     /// The first matching rule wins; the fallback only when nothing else did.
     ///
     /// The value is read as a number once, up front, and the numeric rules
-    /// miss when it is not one — a numeric band never matches a word.
+    /// miss when it is not one — a numeric range never matches a word.
     static func label(for rawValue: String, rules: [StatusRule]) -> String? {
         let value = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         let number = NumberParsing.number(value)?.doubleValue
@@ -87,7 +87,7 @@ enum StatusMapping {
     }
 
     /// `low..high` as a pair, reversed ends put back in order so `100..51`
-    /// bands the same range as `51..100`.
+    /// covers the same range as `51..100`.
     private static func bounds(_ text: String) -> (low: Double, high: Double)? {
         let parts = text.components(separatedBy: "..")
         guard parts.count == 2,
