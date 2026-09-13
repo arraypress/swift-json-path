@@ -23,6 +23,8 @@ import Foundation
 ///   `[>]` the first and last, `[=]` the median, `[-]` the range.
 /// - Math on the result (cents into dollars), then a format (a number to two
 ///   places, a currency, a percentage, a date, a file size, a status label).
+/// - A band beside the value — `<=50:Good, <=100:Moderate, *:Unhealthy`
+///   turns `160` into `160 Unhealthy`, on whichever side you ask for.
 ///
 /// A path that finds nothing extracts nothing. It does not fall back to the
 /// raw body, because a metric that publishes a whole JSON document as its

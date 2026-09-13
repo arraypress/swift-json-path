@@ -78,7 +78,25 @@ struct Extractor {
         }
 
         result.append(query.suffix)
-        return result
+        return banded(result)
+    }
+
+    /// The band's label placed around the finished string.
+    ///
+    /// It reads the raw value, not the formatted one, so a band is a
+    /// threshold on the number itself and survives any display format. No
+    /// value found means no label — there is nothing to describe.
+    private func banded(_ text: String) -> String {
+        guard query.bandPosition != .none, !query.bandRules.isEmpty,
+              let raw = rawValue,
+              let label = StatusMapping.label(for: raw, rules: query.bandRules),
+              !label.isEmpty
+        else { return text }
+        return switch query.bandPosition {
+        case .prefix: label + query.bandSeparator + text
+        case .suffix: text + query.bandSeparator + label
+        case .none: text
+        }
     }
 
     // MARK: - Routes

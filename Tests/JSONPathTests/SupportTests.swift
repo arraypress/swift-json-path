@@ -258,7 +258,9 @@ final class StatusMappingTests: XCTestCase {
         for mode in StatusRule.Mode.allCases {
             XCTAssertEqual(try JSONDecoder().decode(StatusRule.Mode.self, from: JSONEncoder().encode(mode)), mode)
         }
-        XCTAssertEqual(StatusRule.Mode.allCases.map(\.prefix), ["", "=", "~", "*"])
+        XCTAssertEqual(StatusRule.Mode.allCases.map(\.prefix), ["", "=", "~", ">", ">=", "<", "<=", "", "*"])
+        XCTAssertEqual(StatusRule.Mode.allCases.filter { $0.prefix.isEmpty }, [.equals, .range],
+                       "equals is the bare default; range is identified by its .. separator rather than a prefix")
     }
 }
 
