@@ -17,6 +17,9 @@ public enum Format: Sendable, Hashable, Codable {
 
     /// A plain number rounded to `decimals` places, with the system's
     /// grouping: `1234.567` → `1,234.57`. Nil means whole numbers.
+    ///
+    /// The fallback format, and the one most readings end up in, so it groups:
+    /// a subscriber count is read, not counted digit by digit.
     case number(decimals: Int?)
 
     /// A date or timestamp rendered with a `DateFormatter` pattern:
@@ -28,7 +31,10 @@ public enum Format: Sendable, Hashable, Codable {
     /// Shortened: `12500` → `12.5k`, `2000000` → `2m`.
     case compact
 
-    /// Thousands separators: `1234567` → `1,234,567`.
+    /// Thousands separators, always whole: `1234567` → `1,234,567`.
+    ///
+    /// ``number(decimals:)`` groups too; this is the way to say a value is a
+    /// count and has no fractional part to keep.
     case delimited
 
     /// A ratio as a percentage: `0.42` → `42%`.

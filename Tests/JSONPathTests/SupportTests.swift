@@ -122,6 +122,31 @@ final class NumberFormattingTests: XCTestCase {
         XCTAssertEqual(digits(NumberFormatting.plain(-0.5, decimals: 0)), "-0", "a half rounds to the even neighbour")
     }
 
+    /// The default format groups.
+    ///
+    /// Asserted against the locale's own separator rather than a comma, because
+    /// this is display and a French menu bar says `1 234`. Pinned because the
+    /// rest of these tests strip separators before comparing, which is how a
+    /// `124451` sat in the menu bar with a green tick next to it: every
+    /// assertion about `plain` was agnostic to the one thing that was wrong.
+    func testPlainGroups() {
+        let separator = Locale.current.groupingSeparator ?? ","
+        XCTAssertEqual(NumberFormatting.plain(124451, decimals: nil), "124\(separator)451")
+        XCTAssertEqual(NumberFormatting.plain(1234.56, decimals: 2), "1\(separator)234.56",
+                       "grouped and still carrying its pence — what a balance needs")
+        XCTAssertEqual(NumberFormatting.plain(999, decimals: nil), "999", "nothing to group")
+        XCTAssertEqual(NumberFormatting.plain(0, decimals: nil), "0")
+    }
+
+    /// Delimited is the whole-number case of the same thing, so a template that
+    /// asks for either reads the same.
+    func testDelimitedAndWholePlainAgree() {
+        for value: NSNumber in [0, 999, 1000, 124451, 9_876_543] {
+            XCTAssertEqual(NumberFormatting.delimited(value), NumberFormatting.plain(value, decimals: 0),
+                           "delimited(\(value)) should match a whole plain number")
+        }
+    }
+
     func testCompact() {
         XCTAssertEqual(NumberFormatting.compact(999), "999")
         XCTAssertEqual(NumberFormatting.compact(1000), "1k")
@@ -130,7 +155,7 @@ final class NumberFormattingTests: XCTestCase {
         XCTAssertEqual(NumberFormatting.compact(2_250_000), "2.2m", "one decimal, and NumberFormatter rounds a half to the even neighbour")
         XCTAssertEqual(NumberFormatting.compact(2_260_000), "2.3m")
         XCTAssertEqual(NumberFormatting.compact(3_000_000_000), "3b")
-        XCTAssertEqual(NumberFormatting.compact(-1500), "-1500", "below a thousand — negatives never shorten")
+        XCTAssertEqual(NumberFormatting.compact(-1500), "-1,500", "below a thousand — negatives never shorten")
         XCTAssertEqual(NumberFormatting.compact(0), "0")
     }
 

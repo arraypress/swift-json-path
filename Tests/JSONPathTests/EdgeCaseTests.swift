@@ -113,7 +113,7 @@ final class ListEdgeTests: XCTestCase {
         let body = #"{"v": [\#(items)]}"#
         let start = Date()
         XCTAssertEqual(extract(body, Extraction(path: "v[+].n", arrayOperation: .sum)).display.filter(\.isNumber), "49995000")
-        XCTAssertEqual(extract(body, Extraction(path: "v[9999].n")).display, "9999")
+        XCTAssertEqual(extract(body, Extraction(path: "v[9999].n")).display, "9,999")
         XCTAssertLessThan(Date().timeIntervalSince(start), 5)
     }
 }
@@ -132,7 +132,7 @@ final class FormatEdgeTests: XCTestCase {
         XCTAssertEqual(extract(#"{"n": 0}"#, Extraction(path: "n", format: .compact)).display, "0")
         XCTAssertEqual(extract(#"{"n": 0}"#, Extraction(path: "n", format: .duration)).display, "0s")
         XCTAssertEqual(extract(#"{"n": 0}"#, Extraction(path: "n", format: .bytes)).display, "Zero KB")
-        XCTAssertEqual(extract(#"{"n": -1500}"#, Extraction(path: "n", format: .compact)).display, "-1500")
+        XCTAssertEqual(extract(#"{"n": -1500}"#, Extraction(path: "n", format: .compact)).display, "-1,500")
         XCTAssertEqual(extract(#"{"n": 0}"#, Extraction(path: "n", format: .raw)).display, "0")
     }
 

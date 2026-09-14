@@ -15,10 +15,16 @@ import Foundation
 enum NumberFormatting {
 
     /// `decimals` places, grouped: `1234.567` → `1,234.57`. Nil is whole.
+    ///
+    /// Grouped because this is what a reading falls back to when nobody chose
+    /// a format, and an ungrouped `124451` is a number you have to count the
+    /// digits of. `NumberFormatter` does not group unless asked, which is how
+    /// it read that way for as long as it did.
     static func plain(_ number: NSNumber, decimals: Int?) -> String {
         let formatter = NumberFormatter()
         formatter.minimumFractionDigits = decimals ?? 0
         formatter.maximumFractionDigits = decimals ?? 0
+        formatter.usesGroupingSeparator = true
         return formatter.string(from: number) ?? "N/A"
     }
 

@@ -58,8 +58,8 @@ final class KeyPathAndMathTests: XCTestCase {
     }
 
     func testDivisionByZeroLeavesTheValueAlone() {
-        XCTAssertEqual(extract(#"{"balance": 4250}"#, query("balance", math: .divide, mathValue: "0")).display, "4250")
-        XCTAssertEqual(extract(#"{"balance": 4250}"#, query("balance", math: .divide, mathValue: "")).display, "4250")
+        XCTAssertEqual(extract(#"{"balance": 4250}"#, query("balance", math: .divide, mathValue: "0")).display, "4,250")
+        XCTAssertEqual(extract(#"{"balance": 4250}"#, query("balance", math: .divide, mathValue: "")).display, "4,250")
     }
 
     func testANonNumericOperandLeavesMultiplyAloneAndAddsNothing() {
@@ -329,7 +329,7 @@ final class TwoValueTests: XCTestCase {
 
     func testTheSecondValueTakesNoMath() {
         let result = extract(#"{"used": 1200, "total": 5000}"#, query("used", math: .divide, mathValue: "100", secondary: "total", separator: " / "))
-        XCTAssertEqual(result.display, "12 / 5000")
+        XCTAssertEqual(result.display, "12 / 5,000")
         XCTAssertEqual(result.rawValue, "12.0")
     }
 
