@@ -140,6 +140,19 @@ final class NumberFormattingTests: XCTestCase {
 
     /// Delimited is the whole-number case of the same thing, so a template that
     /// asks for either reads the same.
+    /// A value shown from a path and the same value shown later from history go
+    /// through one switch, so they cannot drift.
+    func testPublicFormattingMatchesExtraction() {
+        let formats: [Format] = [.raw, .number(decimals: nil), .number(decimals: 2), .compact,
+                                 .delimited, .percentage, .currency(code: "GBP"), .bytes,
+                                 .duration, .date(pattern: "yyyy"),
+                                 .status(rules: StatusRule.parse("1234:Busy"))]
+        for format in formats {
+            let extracted = JSONPath.extract(Extraction(path: "n", format: format), from: #"{"n": 1234}"#)
+            XCTAssertEqual(format.string(for: 1234), extracted.display, "\(format) drifted between the two paths")
+        }
+    }
+
     func testDelimitedAndWholePlainAgree() {
         for value: NSNumber in [0, 999, 1000, 124451, 9_876_543] {
             XCTAssertEqual(NumberFormatting.delimited(value), NumberFormatting.plain(value, decimals: 0),

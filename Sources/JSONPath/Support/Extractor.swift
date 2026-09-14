@@ -270,33 +270,10 @@ struct Extractor {
     }
 
     /// A number through the query's format.
+    ///
+    /// Shares the switch with ``Format/string(for:)`` so a value shown from
+    /// a path and the same value shown later from history cannot drift apart.
     private func outputResult(from number: NSNumber) -> (formatted: String, raw: Any)? {
-        switch query.format {
-        case .raw:
-            return (number.stringValue, number)
-        case .compact:
-            return (NumberFormatting.compact(number), number)
-        case .delimited:
-            return (NumberFormatting.delimited(number), number)
-        case .percentage:
-            return (NumberFormatting.percentage(number), number)
-        case .currency(let code):
-            return (NumberFormatting.currency(number, code: code), number)
-        case .bytes:
-            return (NumberFormatting.bytes(number), number)
-        case .duration:
-            return (NumberFormatting.duration(number), number)
-        case .status(let rules):
-            // A JSON boolean arrives as a number; it is matched as true/false
-            // so a "true:Up, false:Down" table works, otherwise as the number
-            // itself so "200:OK" does.
-            let isBool = CFGetTypeID(number) == CFBooleanGetTypeID()
-            let key = isBool ? (number.boolValue ? "true" : "false") : number.stringValue
-            return (StatusMapping.labelOrValue(key, rules: rules), number)
-        case .date(let pattern):
-            return (DateFormatting.string(DateParsing.date(fromEpoch: number.doubleValue), pattern: pattern), number)
-        case .number(let decimals):
-            return (NumberFormatting.plain(number, decimals: decimals), number)
-        }
+        (query.format.string(for: number), number)
     }
 }
