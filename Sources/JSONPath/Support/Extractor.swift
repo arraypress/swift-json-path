@@ -132,6 +132,20 @@ struct Extractor {
 
         // An operation over a list: orders[+].price, or prices[+] for scalars.
         else if arrayOperation != .none {
+            // An operation at the top of an object rather than over a list:
+            // `[+].downloads` across {"react": {…}, "vue": {…}}. Some services
+            // key their answer by the thing you asked for instead of listing
+            // it — npm's bulk downloads, Steam's {"570": {…}} — and there was
+            // no way to reach across those values at all.
+            //
+            // Order-independent operations only. An object has no order, so
+            // first and last over one would answer with whichever key the
+            // dictionary handed back, differently on a different run.
+            if PathSyntax.rootPath(in: path) == "", arrayOperation.isOrderIndependent,
+               let values = dictionary.allValues as? [NSDictionary], !values.isEmpty {
+                return operationResult(arrayOperation, path: path, items: values,
+                                       math: math, mathValue: mathValue)
+            }
             if let root = PathSyntax.rootPath(in: path),
                let items = KeyPathWalk.value(forKeyPath: root, in: dictionary) as? [NSDictionary] {
                 return operationResult(arrayOperation, path: path, items: items, math: math, mathValue: mathValue)
@@ -236,6 +250,12 @@ struct Extractor {
         if operation == .count {
             return aggregateResult(Double(items.count))
         }
+        // A key that matched nothing is a path that is wrong, not a total of
+        // zero. `orders[+].typo` was reducing an empty set to 0 and publishing
+        // it as a reading — a number nobody would think to doubt, standing in
+        // for the one that was asked for. An empty list still sums to 0, which
+        // is a real answer: no orders is not the same as no such key.
+        if let numbers, numbers.isEmpty, !items.isEmpty { return nil }
         guard let numbers, let value = Reductions.reduce(numbers, itemCount: items.count, by: operation) else { return nil }
         return aggregateResult(value)
     }

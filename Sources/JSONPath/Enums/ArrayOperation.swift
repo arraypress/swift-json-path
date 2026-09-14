@@ -51,4 +51,17 @@ public enum ArrayOperation: String, CaseIterable, Sendable, Codable {
         guard let match = ArrayOperation.allCases.first(where: { $0.symbol == symbol }) else { return nil }
         self = match
     }
+
+    /// Whether this reduction gives the same answer however the values are ordered.
+    ///
+    /// It decides whether the operation may be used across an object's values as well as a
+    /// list's. A JSON object has no order — `first` and `last` over one would return whichever
+    /// key the dictionary happened to hand back, which is a different answer on a different run
+    /// and a wrong number nobody would think to doubt.
+    public var isOrderIndependent: Bool {
+        switch self {
+        case .sum, .count, .average, .max, .min, .median, .range: true
+        case .none, .first, .last: false
+        }
+    }
 }
