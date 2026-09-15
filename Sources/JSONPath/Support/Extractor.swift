@@ -243,7 +243,15 @@ struct Extractor {
         var numbers: [Double]?
         if let key = PathSyntax.rootKey(in: path) {
             numbers = items.compactMap { item in
-                (keyPathValue(from: item, path: key, math: math, mathValue: mathValue)?.raw as? NSNumber)?.doubleValue
+                if let direct = keyPathValue(from: item, path: key, math: math, mathValue: mathValue)?.raw as? NSNumber {
+                    return direct.doubleValue
+                }
+                // The key may itself carry an index — `results[0].amount` inside each day's
+                // bucket — which a plain key-path walk cannot follow. The same math is applied
+                // per item as above, so a sum of nested values reads like a sum of flat ones.
+                guard key.contains("["), let nested = Locator.located(in: item, path: key) else { return nil }
+                let number = (nested as? NSNumber) ?? (nested as? String).flatMap(NumberParsing.number)
+                return number.map { Arithmetic.apply(math, to: $0, operand: NumberParsing.number(mathValue)).doubleValue }
             }
         }
         // Count has no key and no numbers; every other operation needs both.

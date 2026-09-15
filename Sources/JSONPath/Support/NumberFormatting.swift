@@ -46,17 +46,20 @@ enum NumberFormatting {
 
     /// `1500` → `1.5k`, `2000000` → `2m`, `3000000000` → `3b`. One decimal
     /// only when the division leaves one; below a thousand, a whole number.
+    ///
+    /// Rounded before the unit is chosen: `999,999` is `1m`, not `1,000.0k`,
+    /// which is what dividing first and rounding second produced.
     static func compact(_ number: NSNumber) -> String {
         let value = number.doubleValue
-        if value >= 1_000_000_000 {
-            let decimals = value.truncatingRemainder(dividingBy: 1_000_000_000) == 0 ? 0 : 1
-            return "\(plain(NSNumber(value: value / 1_000_000_000), decimals: decimals))b"
-        } else if value >= 1_000_000 {
-            let decimals = value.truncatingRemainder(dividingBy: 1_000_000) == 0 ? 0 : 1
-            return "\(plain(NSNumber(value: value / 1_000_000), decimals: decimals))m"
-        } else if value >= 1_000 {
-            let decimals = value.truncatingRemainder(dividingBy: 1_000) == 0 ? 0 : 1
-            return "\(plain(NSNumber(value: value / 1_000), decimals: decimals))k"
+        guard value.isFinite, value >= 1_000 else { return plain(number, decimals: 0) }
+        let units: [(divisor: Double, suffix: String)] = [(1_000, "k"), (1_000_000, "m"), (1_000_000_000, "b")]
+        for (position, unit) in units.enumerated() {
+            /// To the even neighbour, as `NumberFormatter` rounds — 2.25m is 2.2m either way
+            let scaled = (value / unit.divisor * 10).rounded(.toNearestOrEven) / 10
+            let isLast = position == units.count - 1
+            guard scaled < 1_000 || isLast else { continue }
+            let decimals = scaled == scaled.rounded() ? 0 : 1
+            return "\(plain(NSNumber(value: scaled), decimals: decimals))\(unit.suffix)"
         }
         return plain(number, decimals: 0)
     }

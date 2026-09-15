@@ -24,8 +24,9 @@ enum Locator {
     }
 
     /// Mirrors the engine's dictionary route: a direct key path, an index, or
-    /// an operation named by the path's own marker.
-    private static func located(in dictionary: NSDictionary, path: String) -> Any? {
+    /// an operation named by the path's own marker. The extractor borrows it
+    /// for a key that carries an index of its own.
+    static func located(in dictionary: NSDictionary, path: String) -> Any? {
         if let direct = KeyPathWalk.value(forKeyPath: path, in: dictionary) {
             return direct
         }

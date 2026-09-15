@@ -23,10 +23,14 @@ enum PathSyntax {
         return ArrayOperation(symbol: marker)
     }
 
-    /// The number inside the first all-digit bracket pair.
+    /// The number inside the first bracket pair, when that pair holds one.
+    ///
+    /// The *first* pair, not the first numeric one: `data[+].results[0].amount` asks for a sum
+    /// across days, and reading its `[0]` as the index used to answer with the first day alone,
+    /// silently, as if it were the total.
     static func index(in path: String) -> Int? {
-        guard let digits = firstBracketContents(in: path, pattern: #"\[(\d+)\]"#) else { return nil }
-        return Int(digits)
+        guard let marker = firstBracketContents(in: path, pattern: #"\[([^\]]+)\]"#) else { return nil }
+        return Int(marker)
     }
 
     /// Everything before the first `[`, else before the first `.`, else nil.

@@ -67,3 +67,50 @@ final class ObjectReductionTests: XCTestCase {
         XCTAssertNil(reduce("{}", "[+].downloads", .sum))
     }
 }
+
+/// A key that carries an index of its own, under an operation.
+final class NestedIndexReductionTests: XCTestCase {
+
+    private let buckets = #"""
+    {"data": [
+        {"starting_at": "2026-09-01", "results": [{"amount": "100.5"}]},
+        {"starting_at": "2026-09-02", "results": [{"amount": "200"}]},
+        {"starting_at": "2026-09-03", "results": []}
+    ]}
+    """#
+
+    func testAnOperationBeforeAnIndexSumsAcrossTheList() {
+        /// Anthropic's cost report: one bucket per day, the amount inside each. This used to
+        /// read as the first day alone — the `[0]` won the branch choice over the `[+]`.
+        let result = JSONPath.extract(Extraction(path: "data[+].results[0].amount", arrayOperation: .sum), from: buckets)
+        XCTAssertEqual(result.rawValue, "300.5")
+        let averaged = JSONPath.extract(Extraction(path: "data[~].results[0].amount", arrayOperation: .average), from: buckets)
+        XCTAssertEqual(averaged.rawValue, "150.25", "the empty bucket has no value and is left out")
+    }
+
+    func testTheMathIsAppliedPerItemBeforeTheSum() {
+        let result = JSONPath.extract(Extraction(path: "data[+].results[0].amount", arrayOperation: .sum,
+                                                 mathOperation: .divide, mathValue: "100"), from: buckets)
+        XCTAssertEqual(result.rawValue, "3.005")
+    }
+
+    func testAnIndexBeforeAnOperationStillReadsInsideOneItem() {
+        let result = JSONPath.extract(Extraction(path: "data[0].results[+].amount", arrayOperation: .sum), from: buckets)
+        XCTAssertEqual(result.rawValue, "100.5")
+    }
+
+    func testTheFirstBracketDecides() {
+        XCTAssertNil(PathSyntax.index(in: "data[+].results[0].amount"), "the first bracket is an operation")
+        XCTAssertEqual(PathSyntax.index(in: "data[0].results[+].amount"), 0)
+        XCTAssertEqual(PathSyntax.operation(in: "data[+].results[0].amount"), .sum)
+    }
+
+    func testCompactRollsUpAtTheBoundary() {
+        XCTAssertEqual(Format.compact.string(for: 999_999), "1m")
+        XCTAssertEqual(Format.compact.string(for: 999_950), "1m")
+        XCTAssertEqual(Format.compact.string(for: 999_940), "999.9k")
+        XCTAssertEqual(Format.compact.string(for: 1_500), "1.5k")
+        XCTAssertEqual(Format.compact.string(for: 2_000_000), "2m")
+        XCTAssertEqual(Format.compact.string(for: 999), "999")
+    }
+}
