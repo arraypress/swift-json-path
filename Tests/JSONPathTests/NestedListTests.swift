@@ -61,8 +61,8 @@ final class NestedListTests: XCTestCase {
 
     func testTheOldShapesAreUntouched() {
         let body = #"{"data": [{"results": [{"amount": "1.5"}, {"amount": "2"}]}, {"results": [{"amount": "4"}]}]}"#
-        XCTAssertEqual(extract(body, "data[0].results[+].amount", .sum).display, "3.5", "one bucket, summed")
-        XCTAssertEqual(extract(body, "data[+].results[+].amount", .sum).display, "7.5", "every bucket, summed")
+        XCTAssertEqual(extract(body, "data[0].results[+].amount", .sum, format: .number(decimals: 1)).display, "3.5", "one bucket, summed")
+        XCTAssertEqual(extract(body, "data[+].results[+].amount", .sum, format: .number(decimals: 1)).display, "7.5", "every bucket, summed")
         XCTAssertEqual(extract(#"{"prices": [3, 4]}"#, "prices[1]").display, "4", "a scalar index")
         XCTAssertEqual(extract(#"{"prices": [3, 4]}"#, "prices[+]", .sum).display, "7", "a scalar sum")
     }
