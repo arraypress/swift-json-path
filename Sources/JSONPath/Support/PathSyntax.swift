@@ -45,11 +45,14 @@ enum PathSyntax {
 
     /// The key after the first `]` (which must be followed by a dot), else
     /// everything after the first `.`, else nil.
+    /// What follows the first bracket: a key path after a dot, or — when the element is itself
+    /// a list — the next bracket onward, so `results[0][0]` reads the first row's first column
     static func rootKey(in path: String) -> String? {
         if let closing = path.firstIndex(of: "]") {
             let rest = path[path.index(after: closing)...]
-            guard rest.first == "." else { return nil }
-            return String(rest.dropFirst())
+            if rest.first == "." { return String(rest.dropFirst()) }
+            if rest.first == "[" { return String(rest) }
+            return nil
         } else if let dot = path.firstIndex(of: ".") {
             return String(path[path.index(after: dot)...])
         }

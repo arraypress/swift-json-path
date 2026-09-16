@@ -51,9 +51,11 @@ Foundation only. No dependencies, every Apple platform, macOS 14+.
 "[#]"                        // a top-level list, counted
 "[1].name"                   // a top-level list, indexed
 "outcomePrices[0]"           // a string that is itself JSON is decoded and walked into
+"results[0][0]"              // a list inside a list: the first row's first column
+"matrix[+][0]"               // an operation over the first column of every row
 ```
 
-The grammar is decided by the first bracket and the first dot: `a.b[0].c` has the root `a.b`, walked as a key path, and the key `c`. Keys are matched as written — `@id` and `città` are keys, and a key that literally contains brackets is found before `[1]` is read as an index. A hop that lands on a string, a number or `null` finds nothing, rather than raising.
+Brackets chain: a bracket straight after a bracket walks into the element as a list of its own, which is how a SQL-style API (PostHog's HogQL, ClickHouse) hands back rows. The grammar is decided by the first bracket and the first dot: `a.b[0].c` has the root `a.b`, walked as a key path, and the key `c`. Keys are matched as written — `@id` and `città` are keys, and a key that literally contains brackets is found before `[1]` is read as an index. A hop that lands on a string, a number or `null` finds nothing, rather than raising.
 
 A body that is not JSON is the value itself, trimmed, through the same math and format — so a HEAD probe's bare `200` can be status-mapped to `Up`.
 

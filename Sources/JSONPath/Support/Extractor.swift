@@ -120,14 +120,20 @@ struct Extractor {
         }
 
         // An index into a list: orders[0].price, or prices[0] for scalars.
-        else if let index = PathSyntax.index(in: path) {
-            if let root = PathSyntax.rootPath(in: path), let key = PathSyntax.rootKey(in: path),
-               let items = KeyPathWalk.value(forKeyPath: root, in: dictionary) as? [NSDictionary], items.count > index {
-                return dictionaryValue(from: items[index], path: key, arrayOperation: arrayOperation, math: math, mathValue: mathValue)
-            } else if let root = PathSyntax.rootPath(in: path), PathSyntax.rootKey(in: path) == nil,
-                      let scalars = KeyPathWalk.value(forKeyPath: root, in: dictionary) as? [Any], scalars.count > index {
-                return scalarResult(scalars[index], math: math, mathValue: mathValue)
+        else if let index = PathSyntax.index(in: path), let root = PathSyntax.rootPath(in: path),
+                let list = KeyPathWalk.value(forKeyPath: root, in: dictionary) as? [Any], list.count > index {
+            guard let key = PathSyntax.rootKey(in: path) else {
+                return scalarResult(list[index], math: math, mathValue: mathValue)
             }
+            let element = KeyPathWalk.decodingEmbeddedJSON(list[index])
+            /// A bracket after a bracket: the element is a list of its own, walked as one.
+            /// `results[0][0]` is how a SQL-style API's first row, first column reads.
+            if key.hasPrefix("[") {
+                return dictionaryValue(from: NSDictionary(dictionary: ["custom": element]), path: "custom" + key,
+                                       arrayOperation: arrayOperation, math: math, mathValue: mathValue)
+            }
+            guard let item = element as? NSDictionary else { return nil }
+            return dictionaryValue(from: item, path: key, arrayOperation: arrayOperation, math: math, mathValue: mathValue)
         }
 
         // An operation over a list: orders[+].price, or prices[+] for scalars.
@@ -152,7 +158,8 @@ struct Extractor {
             } else if let root = PathSyntax.rootPath(in: path),
                       let scalars = KeyPathWalk.value(forKeyPath: root, in: dictionary) as? [Any] {
                 let wrapped = scalars.map { NSDictionary(dictionary: ["value": $0]) }
-                return operationResult(arrayOperation, path: "[\(arrayOperation.symbol)].value", items: wrapped, math: math, mathValue: mathValue)
+                let key = Locator.scalarKey(PathSyntax.rootKey(in: path))
+                return operationResult(arrayOperation, path: "[\(arrayOperation.symbol)].\(key)", items: wrapped, math: math, mathValue: mathValue)
             }
         }
 
